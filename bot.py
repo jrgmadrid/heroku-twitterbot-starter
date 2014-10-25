@@ -3,6 +3,26 @@ import time
 
 import tweepy
 
+class EndlessStream(StreamListener):
+    ''' Handles data received from the stream. '''
+ 
+    def on_status(self, status):
+        # Prints the text of the tweet
+        #print('Tweet text: ' + status.text)
+ 
+        # There are many options in the status object,
+        # hashtags can be very easily accessed.
+        print status.text
+        return true
+ 
+    def on_error(self, status_code):
+        print('Got an error with status code: ' + str(status_code))
+        return True # To continue listening
+ 
+    def on_timeout(self):
+        print('Timeout...')
+        return True # To continue listening
+
 class TwitterAPI:
     """
     Class for accessing the Twitter API.
@@ -26,7 +46,14 @@ class TwitterAPI:
 
 if __name__ == "__main__":
     twitter = TwitterAPI()
-    twitter.tweet("Hello world!") #You probably want to remove this line
-    while True:
-        #Send a tweet here!
-        time.sleep(60)
+    listener = EndlessStream()
+    stream = Stream(twitter.auth, listener)
+    stream.filter(track=['gamergate is'])
+    # twitter.tweet("Hello world!") #You probably want to remove this line
+    #while True:
+    #    for tweet in tweets:
+    #        usr = tweet.user.screen_name
+    #        message = "@%s Actually, it's about ethics in games journalism. #GamerGate" % usr
+    #        twitter.tweet(message)
+    #        time.sleep(30)
+    
